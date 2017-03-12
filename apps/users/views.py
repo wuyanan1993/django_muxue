@@ -55,3 +55,12 @@ class LoginView(View):
                 "login_form": login_form
             }
             return render(request, "login.html", data)
+
+
+class RegisterView(View):
+    def get(self, request):
+        data = {
+
+        }
+        return render(request, "register.html", data)
+
