@@ -3,9 +3,11 @@ from django.shortcuts import render
 from django.http.response import HttpResponse
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.backends import ModelBackend
+from django.contrib.auth.hashers import make_password
 from django.db.models import Q
 from django.views.generic.base import View
-from .forms import LoginForm
+from .forms import LoginForm, RegisterForm
+from utils.email_send import send_register_email
 
 from .models import UserProfile
 
@@ -59,8 +61,24 @@ class LoginView(View):
 
 class RegisterView(View):
     def get(self, request):
+        captcha_form = RegisterForm()
         data = {
-
+            'captcha_form': captcha_form
         }
         return render(request, "register.html", data)
 
+    def post(self, request):
+        register_form = RegisterForm(request.POST)
+        username = request.POST.get('email', '')
+        password = request.POST.get('password', '')
+        if register_form.is_valid():
+            user_profile = UserProfile()
+            user_profile.email = username
+            user_profile.password = make_password(password)
+            user_profile.save()
+            send_register_email(username, "register")
+        else:
+            data = {
+                'msg': u'错误'
+            }
+            return render(request, 'register.html', data)
