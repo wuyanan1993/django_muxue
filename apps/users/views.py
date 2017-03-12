@@ -6,10 +6,10 @@ from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.hashers import make_password
 from django.db.models import Q
 from django.views.generic.base import View
-from .forms import LoginForm, RegisterForm
 from utils.email_send import send_register_email
 
-from .models import UserProfile
+from .models import UserProfile, EmailVerifyRecord
+from .forms import LoginForm, RegisterForm, ForgetPwdForm
 
 # Create your views here.
 
@@ -38,11 +38,14 @@ class LoginView(View):
         if login_form.is_valid():
             user = authenticate(username=username, password=password)
             if user is not None:
-                login(request, user)
-                data = {
-
-                }
-                return render(request, "index.html", data)
+                if user.is_active:
+                    login(request, user)
+                    return render(request, "index.html",)
+                else:
+                    data = {
+                        'msg': u'用户未激活'
+                    }
+                    return render(request, "login.html", data)
             else:
                 data = {
                     "msg": u'用户名或密码错误',
@@ -61,9 +64,9 @@ class LoginView(View):
 
 class RegisterView(View):
     def get(self, request):
-        captcha_form = RegisterForm()
+        register_form = RegisterForm()
         data = {
-            'captcha_form': captcha_form
+            'register_form': register_form
         }
         return render(request, "register.html", data)
 
@@ -72,13 +75,55 @@ class RegisterView(View):
         username = request.POST.get('email', '')
         password = request.POST.get('password', '')
         if register_form.is_valid():
+            if UserProfile.objects.get(email=username):
+                data = {
+                    'msg': u'该邮箱已经注册',
+                    'register_form': register_form,
+                }
+                return render(request, 'register.html', data)
             user_profile = UserProfile()
             user_profile.email = username
             user_profile.password = make_password(password)
             user_profile.save()
             send_register_email(username, "register")
+            return render(request, 'login.html')
         else:
             data = {
-                'msg': u'错误'
+                'register_form': register_form,
             }
             return render(request, 'register.html', data)
+
+
+class ActiveUserView(View):
+    def get(self, request, active_code):
+        records = EmailVerifyRecord.objects.filter(code=active_code)
+        if records:
+            for record in records:
+                email = record.email
+                user = UserProfile.objects.get(email=email)
+                user.is_active = True
+                user.save()
+            return render(request, 'login.html', )
+        else:
+            return render(request, 'active_fail.html', )
+
+
+class ForgetPwdView(View):
+    def get(self, request):
+        forget_pwd_form = ForgetPwdForm()
+        data = {
+            'forget_pwd_form': forget_pwd_form
+        }
+        return render(request, 'forgetpwd.html', data)
+
+    def post(self, request):
+        forget_pwd_form = ForgetPwdForm(request.POST)
+        if forget_pwd_form.is_valid():
+            email = request.POST.get('email', '')
+            send_register_email(email, "forget")
+            return render(request, 'send_email_success.html')
+        else:
+            data = {
+                'forget_pwd_form': forget_pwd_form
+            }
+            return render(request, 'forgetpwd.html', data)
