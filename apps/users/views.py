@@ -9,7 +9,7 @@ from django.views.generic.base import View
 from utils.email_send import send_register_email
 
 from .models import UserProfile, EmailVerifyRecord
-from .forms import LoginForm, RegisterForm, ForgetPwdForm
+from .forms import LoginForm, RegisterForm, ForgetPwdForm, ModifyPwdForm
 
 # Create your views here.
 
@@ -127,3 +127,46 @@ class ForgetPwdView(View):
                 'forget_pwd_form': forget_pwd_form
             }
             return render(request, 'forgetpwd.html', data)
+
+
+class ResetPwdView(View):
+    def get(self, request, reset_code):
+        records = EmailVerifyRecord.objects.filter(code=reset_code, send_type='forget')
+        if records:
+            for record in records:
+                email = record.email
+                data = {
+                    'email': email
+                }
+                return render(request, 'password_reset.html', data)
+        else:
+            data = {
+                'msg': u'您的链接有误。'
+            }
+            return render(request, 'info.html', data)
+
+
+class ModifyPwdView(View):
+    def post(self, request):
+        modify_form = ModifyPwdForm(request.POST)
+        email = request.POST.get('email')
+        if modify_form.is_valid():
+            password1 = request.POST.get('password1')
+            password2 = request.POST.get('password2')
+            if password1 != password2:
+                data = {
+                    'msg': u'两次输入密码不一致',
+                    'email': email
+                }
+                return render(request, 'password_reset.html', data)
+            else:
+                user = UserProfile.objects.get(email=email)
+                user.password = make_password(password1)
+                user.save()
+                return render(request, 'login.html', )
+        else:
+            data = {
+                'msg': u'密码填写不规范',
+                'email': email
+            }
+            return render(request, 'password_reset.html', data)
