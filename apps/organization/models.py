@@ -23,8 +23,8 @@ class CityDict(models.Model):
 class CourseOrg(models.Model):
     COURSE_CATEGORY = (
         ('edu_org', u'培训机构'),
-        ('teacher', u'老师'),
-        ('other', u'其他')
+        ('teacher', u'高校'),
+        ('other', u'个人')
     )
     name = models.CharField(max_length=50, verbose_name=u'机构名称')
     description = models.TextField(verbose_name=u'描述')
@@ -41,6 +41,9 @@ class CourseOrg(models.Model):
     class Meta:
         verbose_name = u'课程机构'
         verbose_name_plural = verbose_name
+
+    def __unicode__(self):
+        return self.name
 
 
 class Teacher(models.Model):

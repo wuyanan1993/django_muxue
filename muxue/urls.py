@@ -16,7 +16,11 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.views.generic import TemplateView
+from django.views.static import serve
+
+from muxue.settings import MEDIA_ROOT
 from users.views import LoginView, RegisterView, ActiveUserView, ForgetPwdView, ResetPwdView, ModifyPwdView
+from organization.views import OrgListView
 
 import xadmin
 
@@ -29,5 +33,7 @@ urlpatterns = [
     url(r'^active/(?P<active_code>.*)/$', ActiveUserView.as_view(), name='user_active'),
     url(r'^forget_pwd/$', ForgetPwdView.as_view(), name='forget_pwd'),
     url(r'^reset/(?P<reset_code>.*)/$', ResetPwdView.as_view(), name='reset_pwd'),
-    url(r'^modify_pwd/$', ModifyPwdView.as_view(), name='modify_pwd')
+    url(r'^modify_pwd/$', ModifyPwdView.as_view(), name='modify_pwd'),
+    url(r'^org_list/$', OrgListView.as_view(), name='org_list'),
+    url(r'^media/(?P<path>.*)$', serve, {"document_root": MEDIA_ROOT}),
 ]

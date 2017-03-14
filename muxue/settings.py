@@ -48,7 +48,8 @@ INSTALLED_APPS = [
     'organization',
     'crispy_forms',
     'xadmin',
-    'captcha'
+    'captcha',
+    'pure_pagination'
 ]
 AUTH_USER_MODEL = 'users.UserProfile'
 MIDDLEWARE_CLASSES = [
@@ -76,6 +77,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.core.context_processors.media',
             ],
         },
     },
@@ -146,3 +148,14 @@ EMAIL_HOST_USER = 'wynaiyyf@sina.cn'
 EMAIL_HOST_PASSWORD = '199323wyn*'
 EMAIL_USE_TLS = False
 EMAIL_FROM = "wynaiyyf@sina.cn"
+
+# for user staticfiles
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# for pagination settings
+PAGINATION_SETTINGS = {
+    'PAGE_RANGE_DISPLAYED': 2,
+    'MARGIN_PAGES_DISPLAYED': 1,
+    'SHOW_FIRST_PAGE_WHEN_INVALID': True,
+}
