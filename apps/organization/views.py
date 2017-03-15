@@ -1,8 +1,12 @@
 # _*_ coding: utf-8 *_*
+import simplejson
+
 from django.shortcuts import render
 from django.views.generic import View
+from django.http import HttpResponse
 
 from organization.models import CourseOrg, CityDict
+from organization.forms import UserAskModelForm
 
 from pure_pagination import Paginator, EmptyPage, PageNotAnInteger
 # Create your views here.
@@ -47,3 +51,20 @@ class OrgListView(View):
             'sort': sort
         }
         return render(request, 'org-list.html', data)
+
+
+class AddUserAskView(View):
+    def post(self, request):
+        user_ask_form = UserAskModelForm(request.POST)
+        if user_ask_form.is_valid():
+            user_ask = user_ask_form.save(commit=True)
+            data = {
+                'status': 'success'
+            }
+            return HttpResponse(simplejson.dumps(data, ensure_ascii=False), content_type='application/json')
+        else:
+            data = {
+                'status': 'fail',
+                'msg': u'添加出错',
+            }
+            return HttpResponse(simplejson.dumps(data, ensure_ascii=False), content_type='application/json')
