@@ -68,3 +68,16 @@ class AddUserAskView(View):
                 'msg': u'添加出错',
             }
             return HttpResponse(simplejson.dumps(data, ensure_ascii=False), content_type='application/json')
+
+
+class OrganizationView(View):
+    def get(self, request, org_id):
+        course_org = CourseOrg.objects.get(id=int(org_id))
+        all_courses = course_org.course_set.all()[:5]
+        all_teachers = course_org.teacher_set.all()[:3]
+        data = {
+            'all_courses': all_courses,
+            'all_teachers': all_teachers,
+            'course_org': course_org
+        }
+        return render(request, 'org-detail-homepage.html', data)

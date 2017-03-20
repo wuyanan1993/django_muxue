@@ -56,7 +56,11 @@ class Teacher(models.Model):
     click_number = models.IntegerField(default=0, verbose_name=u'点击次数')
     favorite_number = models.IntegerField(default=0, verbose_name=u'收藏数')
     add_time = models.DateTimeField(default=datetime.now, verbose_name=u'时间')
+    image = models.ImageField(default='', upload_to='org/%Y/%m', verbose_name=u'讲师头像')
 
     class Meta:
         verbose_name = u'老师'
         verbose_name_plural = verbose_name
+
+    def __unicode__(self):
+        return self.name
