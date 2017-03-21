@@ -78,6 +78,31 @@ class OrganizationView(View):
         data = {
             'all_courses': all_courses,
             'all_teachers': all_teachers,
-            'course_org': course_org
+            'course_org': course_org,
+            'menu': 'homepage'
         }
         return render(request, 'org-detail-homepage.html', data)
+
+
+class OrgCourseView(View):
+    def get(self, request, org_id):
+        course_org = CourseOrg.objects.get(id=int(org_id))
+        all_courses = course_org.course_set.all()
+        data = {
+            'all_courses': all_courses,
+            'course_org': course_org,
+            'menu': 'courses'
+        }
+        return render(request, 'org-detail-course.html', data)
+
+
+class OrgTeacherView(View):
+    def get(self, request, org_id):
+        course_org = CourseOrg.objects.get(id=int(org_id))
+        all_teachers = course_org.teacher_set.all()
+        data = {
+            'all_teachers': all_teachers,
+            'course_org': course_org,
+            'menu': 'teacher'
+        }
+        return render(request, 'org-detail-teachers.html', data)
