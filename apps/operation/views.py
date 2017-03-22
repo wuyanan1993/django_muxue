@@ -6,7 +6,9 @@ from django.views.generic import View
 from django.http.response import HttpResponse
 
 from operation.models import UserFavorite
-# Create your views here.
+
+
+# Create your views here.0000
 
 
 class UserFavoriteView(View):
