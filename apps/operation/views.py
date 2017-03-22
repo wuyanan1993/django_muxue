@@ -8,7 +8,7 @@ from django.http.response import HttpResponse
 from operation.models import UserFavorite
 
 
-# Create your views here.0000
+# Create your views here.0000000000
 
 
 class UserFavoriteView(View):
